@@ -181,7 +181,7 @@ class CarInterface(CarInterfaceBase):
       ret.wheelbase = 3.273
       ret.steerRatio = 11.94  # https://www.hyundai.com/content/dam/hyundai/au/en/models/staria-load/premium-pip-update-2023/spec-sheet/STARIA_Load_Spec-Table_March_2023_v3.1.pdf
     elif candidate == CAR.NEXO: # fix PolorBear - 22.06.05
-      ret.mass = 1885. * CV.LB_TO_KG
+      ret.mass = 1885.
       ret.wheelbase = 2.79
       ret.steerRatio = 14.19  #https://www.hyundainews.com/en-us/models/hyundai-nexo-2019-nexo/specifications
       ret.tireStiffnessFactor = 0.385
@@ -387,7 +387,7 @@ class CarInterface(CarInterfaceBase):
         addr, bus = 0x730, CanBus(CP).ECAN
       disable_ecu(logcan, sendcan, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
       enable_radar_tracks(CP, logcan, sendcan)
-      
+
     # for blinkers
     if CP.flags & HyundaiFlags.ENABLE_BLINKERS:
       disable_ecu(logcan, sendcan, bus=CanBus(CP).ECAN, addr=0x7B1, com_cont_req=b'\x28\x83\x01')
@@ -453,4 +453,3 @@ class CarInterface(CarInterfaceBase):
 
   def create_buttons_can_fd_alt(self, button):
     return None
-

@@ -63,7 +63,7 @@ class CarState(CarStateBase):
     self.lfa_btn = 0
     self.lfa_enabled = False
     self.gear_shifter = GearShifter.park
-    
+
   def update(self, cp, cp_cam):
     if self.CP.carFingerprint in CANFD_CAR:
       return self.update_canfd(cp, cp_cam)
@@ -156,8 +156,23 @@ class CarState(CarStateBase):
 
     # Gear Selection via Cluster - For those Kia/Hyundai which are not fully discovered, we can use the Cluster Indicator for Gear Selection,
     # as this seems to be standard over all cars, but is not the preferred method.
-    if self.CP.flags & (HyundaiFlags.HYBRID | HyundaiFlags.EV):
+    if self.CP.flags & (HyundaiFlags.HYBRID | HyundaiFlags.EV) or self.CP.carFingerprint == CAR.NEXO:
       gear = cp.vl["ELECT_GEAR"]["Elect_Gear_Shifter"]
+      gear_shifter = GearShifter.unknown
+
+      if gear == 1546:  # Thank you for Neokii
+        gear_shifter = GearShifter.drive
+      elif gear == 2314:
+        gear_shifter = GearShifter.neutral
+      elif gear == 2569:
+        gear_shifter = GearShifter.park
+      elif gear == 2566:
+        gear_shifter = GearShifter.reverse
+
+      if gear_shifter != GearShifter.unknown and self.gear_shifter != gear_shifter:
+        self.gear_shifter = gear_shifter
+
+      ret.gearShifter = self.gear_shifter
     elif self.CP.carFingerprint in CAN_GEARS["use_cluster_gears"]:
       gear = cp.vl["ELECT_GEAR"]["Elect_Gear_Shifter"]
       gear_shifter = GearShifter.unknown
@@ -390,7 +405,7 @@ class CarState(CarStateBase):
         ("EMS16", 100),
       ]
 
-    if CP.flags & (HyundaiFlags.HYBRID | HyundaiFlags.EV):
+    if CP.flags & (HyundaiFlags.HYBRID | HyundaiFlags.EV) or CP.carFingerprint == CAR.NEXO:
       messages.append(("ELECT_GEAR", 20))
     elif CP.carFingerprint in CAN_GEARS["use_cluster_gears"]:
       pass

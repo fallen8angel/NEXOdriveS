@@ -27,7 +27,7 @@ def enable_radar_tracks(CP, logcan, sendcan):
               #new_config = b"\x00\x00\x00\x00\x00\x01"
               dataId = b'\x01\x42'
               WRITE_DAT_REQUEST = b'\x2e'
-              WRITE_DAT_RESPONSE = b'\x68'
+              WRITE_DAT_RESPONSE = b'\x6e'
               query = IsoTpParallelQuery(sendcan, logcan, CP.sccBus, [rdr_fw_address], [WRITE_DAT_REQUEST+dataId+new_config], [WRITE_DAT_RESPONSE], debug=True)
               query.get_data(0)
               print(f"Try {i+1}")
@@ -71,7 +71,7 @@ def enable_radar_tracks(CP, logcan, sendcan):
               #new_config = b"\x00\x00\x00\x00\x00\x01"
               dataId = b'\x01\x42'
               WRITE_DAT_REQUEST = b'\x2e'
-              WRITE_DAT_RESPONSE = b'\x68'
+              WRITE_DAT_RESPONSE = b'\x6e'
               query = IsoTpParallelQuery(sendcan, logcan, CP.sccBus, [rdr_fw.address], [WRITE_DAT_REQUEST+dataId+new_config], [WRITE_DAT_RESPONSE], debug=True)
               query.get_data(0)
               print(f"Try {i+1}")

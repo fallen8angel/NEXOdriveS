@@ -343,6 +343,11 @@ class CarInterface(CarInterfaceBase):
         ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.hyundai, 0)]
 
       ret.sccBus = 2 if (candidate in CAMERA_SCC_CAR or Params().get_bool('SccOnBus2')) else 0
+
+      # NEXO: radar tracks are enabled during init, so keep radar parsing available
+      # even when 0x500 tracks are not visible during initial fingerprinting.
+      if candidate == CAR.NEXO and ret.openpilotLongitudinalControl and ret.sccBus == 0:
+        ret.radarUnavailable = False
       ret.hasAutoHold = 1151 in fingerprint[0]
       ret.hasLfaHda = 1157 in fingerprint[0]
       ret.hasNav = 1348 in fingerprint[0]

@@ -6,7 +6,7 @@ def retryWithDelay(int maxRetries, int delay, Closure body) {
       sleep(delay)
     }
   }
-  throw Exception("Failed after ${maxRetries} retries")
+  throw new Exception("Failed after ${maxRetries} retries")
 }
 
 def device(String ip, String step_label, String cmd) {

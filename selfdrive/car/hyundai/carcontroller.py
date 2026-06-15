@@ -13,6 +13,7 @@ from openpilot.selfdrive.car.hyundai.values import HyundaiFlags, Buttons, CarCon
 from openpilot.selfdrive.car.interfaces import ACCEL_MAX, ACCEL_MIN
 from openpilot.selfdrive.controls.neokii.cruise_state_manager import CruiseStateManager
 from openpilot.selfdrive.controls.neokii.navi_controller import SpeedLimiter
+from openpilot.selfdrive.controls.neokii.speed_controller import CREEP_SPEED
 from openpilot.common.params import Params
 
 VisualAlert = car.CarControl.HUDControl.VisualAlert
@@ -195,6 +196,12 @@ class CarController:
       if self.frame % 2 == 0 and self.CP.openpilotLongitudinalControl:
         # TODO: unclear if this is needed
         jerk = 3.0 if actuators.longControlState == LongCtrlState.pid else 1.0
+
+        if CC.longActive and not stopping and accel > 0.0:
+          start_boost = interp(CS.out.vEgo, [CREEP_SPEED, 1.6 * CREEP_SPEED], [0.35 if self.e2e_long else 0.5, 0.0])
+          is_accelerating = interp(accel, [0.0, 0.2], [0.0, 1.0])
+          boost = start_boost * is_accelerating
+          accel = clip(accel + boost, ACCEL_MIN, ACCEL_MAX)
 
         stock_cam = False
         if self.CP.sccBus == 2:

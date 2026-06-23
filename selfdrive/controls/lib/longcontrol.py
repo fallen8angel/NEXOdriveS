@@ -109,7 +109,7 @@ class LongControl:
       self.reset(CS.vEgo)
 
     elif self.long_control_state == LongCtrlState.starting:
-      output_accel = self.CP.startAccel if CS.vEgo < 0.01 else 0.
+      output_accel = self.CP.startAccel
       self.reset(CS.vEgo)
 
     elif self.long_control_state == LongCtrlState.pid:

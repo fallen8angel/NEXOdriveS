@@ -10,26 +10,26 @@ nTuneMainWidget::nTuneMainWidget(QWidget *parent)
     : QWidget{parent} {
 
     QList<QString> mainTitles = {
-    "General", "SCC", "Torque"
+    "기본", "크루즈", "핸들"
     };
 
     QList<QList<TuneItemInfo>> mainItems = {
     {
-        TuneItemInfo("common.json", "pathFactor", tr("If oversteer occurs in a corner, reduce it."),
+        TuneItemInfo("common.json", "pathFactor", "차선추종 강도", tr("커브에서 차선을 따라가는 힘입니다. 바깥으로 밀리면 올리고, 안쪽으로 과하게 파고들면 내리세요."),
                      0.96f, 0.9f, 1.1f, 0.01f, 2),
-        TuneItemInfo("common.json", "steerActuatorDelay", "",
+        TuneItemInfo("common.json", "steerActuatorDelay", "핸들 반응 지연", tr("핸들 명령 후 실제 차량이 반응하기까지의 시간입니다. 커브 반응이 늦으면 조금 올리고, 잔조향이 많으면 내리세요."),
                      0.2f, 0.0f, 0.8f, 0.05f, 2),
     },
     {
-        TuneItemInfo("scc_v2.json", "longStartingFactor", tr("Acceleration at start, increasing this value will make the acceleration faster."),
+        TuneItemInfo("scc_v2.json", "longStartingFactor", "출발 가속 강도", tr("정지 후 출발할 때 가속 힘입니다. 출발이 답답하면 올리고, 튀어나가는 느낌이면 내리세요."),
                      1.4f, 0.7f, 1.65f, 0.1f, 1),
-        TuneItemInfo("scc_v2.json", "longLeadSensitivity", tr("Sensitivity lead, the higher it is, the more sensitive the response to the lead."),
+        TuneItemInfo("scc_v2.json", "longLeadSensitivity", "앞차 반응 민감도", tr("앞차 감속이나 출발에 반응하는 민감도입니다. 앞차 반응이 늦으면 올리고, 너무 자주 감속하면 내리세요."),
                      0.9f, 0.5f, 1.3f, 0.1f, 1),
     },
     {
-        TuneItemInfo("lat_torque_v4.json", "latAccelFactor", "", 2.5f, 0.5f, 4.5f, 0.1f, 2),
-        TuneItemInfo("lat_torque_v4.json", "friction", "", 0.1f, 0.0f, 0.2f, 0.01f, 3),
-        TuneItemInfo("lat_torque_v4.json", "angle_deadzone_v2", "", 0.0f, 0.0f, 2.0f, 0.01f, 3),
+        TuneItemInfo("lat_torque_v4.json", "latAccelFactor", "코너 조향 강도", tr("커브에서 핸들을 돌리는 힘입니다. 바깥으로 밀리면 올리고, 너무 과하게 꺾이면 내리세요."), 2.5f, 0.5f, 4.5f, 0.1f, 2),
+        TuneItemInfo("lat_torque_v4.json", "friction", "핸들 마찰 보정", tr("핸들이 처음 움직일 때의 둔한 느낌을 보정합니다. 초반 조향이 답답하면 올리고, 잔조향이 많으면 내리세요."), 0.1f, 0.0f, 0.2f, 0.01f, 3),
+        TuneItemInfo("lat_torque_v4.json", "angle_deadzone_v2", "미세조향 무시값", tr("아주 작은 핸들 움직임을 무시하는 범위입니다. 직진 중 좌우로 흔들리면 올리고, 반응이 둔하면 내리세요."), 0.0f, 0.0f, 2.0f, 0.01f, 3),
     },
     };
 
@@ -116,7 +116,7 @@ nTunePannel::nTunePannel(QList<TuneItemInfo>& items, QWidget *parent)
     )");
 
     foreach (const TuneItemInfo item, items) {
-        tabBar->addTab(item.key);
+        tabBar->addTab(item.title);
         stackedWidget->addWidget(new nTuneWidget(item));
     }
 

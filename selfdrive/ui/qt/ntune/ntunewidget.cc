@@ -21,18 +21,18 @@ void nTuneWidget::setupUi() {
     auto mainLayout = new QVBoxLayout(this);
     // Step Scale Layout
     auto stepScaleLayout = new QHBoxLayout();
-    labelStepScale = new QLabel("Step Scale:");
+    labelStepScale = new QLabel("조정 단위:");
     spinnerStepScale = new QComboBox();
     spinnerStepScale->addItems({"x0.01", "x0.1", "x0.5", "x1", "x5", "x10"});
     stepScaleLayout->addWidget(labelStepScale);
     stepScaleLayout->addWidget(spinnerStepScale);
     //mainLayout->addLayout(stepScaleLayout);
 
-    labelStepScale->setText(QString("Step: %1").arg(getStep(), 0, 'f', 2));
+    labelStepScale->setText(QString("조정 단위: %1").arg(getStep(), 0, 'f', 2));
     spinnerStepScale->setCurrentIndex(QSettings(QSETTING_ORGINIZATION).value(getSaveKey(), 3).toInt());
 
     // Reset Button
-    btnReset = new QPushButton("Reset");
+    btnReset = new QPushButton("초기화");
     mainLayout->addWidget(btnReset, 0, Qt::AlignRight);
 
     btnReset->setStyleSheet(R"(
@@ -54,15 +54,15 @@ void nTuneWidget::setupUi() {
     valueLayout->setSizeConstraint(QLayout::SetMinimumSize);
     valueLayout->setContentsMargins(0, 20, 0, 20);
 
-    QLabel *textKey = new QLabel("Key");
+    QLabel *textKey = new QLabel("항목");
     textKey->setAlignment(Qt::AlignCenter);
     textKey->setStyleSheet("QLabel { font-weight: bold; font-size: 70px; margin: 0px; padding: 5px;}");
-    QLabel *textDesc = new QLabel("Description");
+    QLabel *textDesc = new QLabel("설명");
     textDesc->setAlignment(Qt::AlignCenter);
     textDesc->setStyleSheet("QLabel { font-size: 50px; margin: 0px; padding: 5px; }");
     textDesc->setWordWrap(true);
     textDesc->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    QLabel *textMinMax = new QLabel("MinMax");
+    QLabel *textMinMax = new QLabel("범위");
     textMinMax->setAlignment(Qt::AlignCenter);
     textMinMax->setStyleSheet("QLabel { font-size: 55px; margin: 0px; padding: 5px;}");
 
@@ -82,8 +82,8 @@ void nTuneWidget::setupUi() {
 
     // Increase & Decrease Buttons
     QHBoxLayout *controlLayout = new QHBoxLayout();
-    btnDecrease = new QPushButton(tr("Decrease(-)"));
-    btnIncrease = new QPushButton(tr("Increase(+)"));
+    btnDecrease = new QPushButton(tr("내리기(-)"));
+    btnIncrease = new QPushButton(tr("올리기(+)"));
 
     auto btnStyle = R"(
         QPushButton {
@@ -111,7 +111,7 @@ void nTuneWidget::setupUi() {
     mainLayout->addLayout(controlLayout);
 
     //
-    textKey->setText(itemInfo.key);
+    textKey->setText(itemInfo.title);
     textDesc->setText(itemInfo.desc);
     textMinMax->setText(itemInfo.getMinMaxText());
 
@@ -153,7 +153,7 @@ void nTuneWidget::onResetClicked() {
 
 void nTuneWidget::onStepIndexChanged(int index) {
     QSettings(QSETTING_ORGINIZATION).setValue(getSaveKey(), index);
-    labelStepScale->setText(QString("Step: %1").arg(getStep(), 0, 'f', 2));
+    labelStepScale->setText(QString("조정 단위: %1").arg(getStep(), 0, 'f', 2));
 }
 
 QJsonObject nTuneWidget::load() {

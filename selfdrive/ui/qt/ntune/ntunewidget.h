@@ -17,6 +17,7 @@ private:
     QString confPath;
 public:
     QString key;
+    QString title;
     QString desc;
     float defValue;
     float min;
@@ -24,9 +25,11 @@ public:
     float step;
     int precision;
 
-    TuneItemInfo() : confPath(""), key(""), desc(""), defValue(0), min(0), max(0), step(0), precision(0) {}
+    TuneItemInfo() : confPath(""), key(""), title(""), desc(""), defValue(0), min(0), max(0), step(0), precision(0) {}
     TuneItemInfo(QString confPath, QString key, QString desc, float defValue, float min, float max, float step, int precision)
-        : confPath(confPath), key(key), desc(desc), defValue(defValue), min(min), max(max), step(step), precision(precision) {}
+        : confPath(confPath), key(key), title(key), desc(desc), defValue(defValue), min(min), max(max), step(step), precision(precision) {}
+    TuneItemInfo(QString confPath, QString key, QString title, QString desc, float defValue, float min, float max, float step, int precision)
+        : confPath(confPath), key(key), title(title), desc(desc), defValue(defValue), min(min), max(max), step(step), precision(precision) {}
 
     QString toString(float value) const {
         return QString::asprintf("%.*f", precision, value);
@@ -81,4 +84,3 @@ private slots:
     void onResetClicked();
     void onStepIndexChanged(int index);
 };
-

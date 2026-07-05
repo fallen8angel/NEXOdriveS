@@ -415,10 +415,27 @@ class SpeedController:
       lead_radar = c.sm['radarState'].leadOne
       lead_model = c.sm['modelV2'].leadsV3[0]
 
-      radar_dist = lead_radar.dRel if lead_radar.status and lead_radar.radar else 0
-      vision_dist = lead_model.x[0] - RADAR_TO_CAMERA if lead_model.prob > .5 else 0
+      radar_ok = lead_radar.status
+      radar_used = lead_radar.radar if radar_ok else False
+      radar_dist = lead_radar.dRel if radar_ok and radar_used else 0
+      radar_y = lead_radar.yRel if radar_ok and radar_used else 0
+      radar_vrel = lead_radar.vRel if radar_ok and radar_used else 0
+      radar_vlead = lead_radar.vLead if radar_ok and radar_used else 0
+      radar_accel = lead_radar.aLeadK if radar_ok and radar_used else 0
+      radar_id = lead_radar.radarTrackId if radar_ok and radar_used else -1
 
-      debug_text += "Lead: {:.1f}/{:.1f}/{:.1f}\n".format(radar_dist, vision_dist, (radar_dist - vision_dist))
+      vision_ok = lead_model.prob > .5
+      vision_dist = lead_model.x[0] - RADAR_TO_CAMERA if vision_ok else 0
+      vision_y = -lead_model.y[0] if vision_ok else 0
+      vision_vrel = lead_model.v[0] - CS.vEgo if vision_ok else 0
+      vision_prob = lead_model.prob
+
+      debug_text += "앞차거리 레/비/차: {:.1f}/{:.1f}/{:.1f}\n".format(radar_dist, vision_dist, (radar_dist - vision_dist))
+      debug_text += "레이더ID/사용: {}/{}\n".format(radar_id, radar_used)
+      debug_text += "레이더 좌우/상대속도: {:.1f}/{:.1f}\n".format(radar_y, radar_vrel)
+      debug_text += "레이더 앞차속도/가속: {:.1f}/{:.1f}\n".format(radar_vlead, radar_accel)
+      debug_text += "비전 좌우/상대속도: {:.1f}/{:.1f}\n".format(vision_y, vision_vrel)
+      debug_text += "비전확률: {:.2f}\n".format(vision_prob)
 
       md = c.sm['modelV2']
       debug_text += "Lane: {:.2f}/{:.2f}, {:.2f}/{:.2f}".format(md.laneLineProbs[1], md.laneLineProbs[2],

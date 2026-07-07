@@ -411,6 +411,7 @@ class SpeedController:
       debug_text += "Actuator Accel: {:.2f}\n".format(actuators.accel)
       debug_text += "Apply Accel: {:.2f}\n".format(CC.applyAccel)
       debug_text += "Stock Accel: {:.2f}\n".format(CS.aReqValue)
+      debug_text += "브레이크/가속페달: {}/{}\n".format(CS.brakePressed, CS.gasPressed)
 
       lead_radar = c.sm['radarState'].leadOne
       lead_model = c.sm['modelV2'].leadsV3[0]

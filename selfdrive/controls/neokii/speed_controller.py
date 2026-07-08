@@ -4,6 +4,7 @@ import numpy as np
 from common.numpy_fast import clip, interp
 from cereal import car
 from openpilot.common.conversions import Conversions as CV
+from openpilot.common.realtime import DT_CTRL
 from openpilot.selfdrive.controls.lib.drive_helpers import V_CRUISE_MIN, V_CRUISE_MAX, V_CRUISE_ENABLE_MIN, V_CRUISE_UNSET
 from openpilot.selfdrive.controls.neokii.cruise_state_manager import CruiseStateManager, V_CRUISE_DELTA_KM, V_CRUISE_DELTA_MI, \
   V_CRUISE_MIN_CRUISE_STATE
@@ -12,6 +13,7 @@ from openpilot.common.params import Params
 from openpilot.selfdrive.controls.neokii.navi_controller import SpeedLimiter
 from openpilot.selfdrive.controls.ntune import ntune_common_get
 from openpilot.selfdrive.controls.radard import RADAR_TO_CAMERA
+from openpilot.selfdrive.modeld.constants import ModelConstants
 
 TRAJECTORY_SIZE = 33
 SYNC_MARGIN = 3.
@@ -412,6 +414,18 @@ class SpeedController:
       debug_text += "Apply Accel: {:.2f}\n".format(CC.applyAccel)
       debug_text += "Stock Accel: {:.2f}\n".format(CS.aReqValue)
       debug_text += "브레이크/가속페달: {}/{}\n".format(CS.brakePressed, CS.gasPressed)
+      long_plan = c.sm["longitudinalPlan"]
+      speeds = long_plan.speeds
+      v_target = 0.0
+      v_target_1sec = 0.0
+      if len(speeds):
+        t_since_plan = (c.sm.frame - c.sm.recv_frame["longitudinalPlan"]) * DT_CTRL
+        v_target = interp(t_since_plan, ModelConstants.T_IDXS[:len(speeds)], speeds)
+        v_target_1sec = interp(t_since_plan + 1.0, ModelConstants.T_IDXS[:len(speeds)], speeds)
+      accelerating = v_target_1sec > v_target
+      starting_condition = (v_target_1sec > c.CP.vEgoStarting and accelerating and not CS.cruiseState.standstill and not CS.brakePressed)
+      debug_text += "목표/1초뒤: {:.2f}/{:.2f}\n".format(v_target, v_target_1sec)
+      debug_text += "가속예측/출발조건: {}/{}\n".format(accelerating, starting_condition)
 
       lead_radar = c.sm['radarState'].leadOne
       lead_model = c.sm['modelV2'].leadsV3[0]

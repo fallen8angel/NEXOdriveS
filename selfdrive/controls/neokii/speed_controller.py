@@ -403,58 +403,9 @@ class SpeedController:
       actuators = c.last_actuators
       loc = c.LoC
 
-      debug_text  = "Standstill: {}\n".format(CS.cruiseState.standstill)
-      debug_text += "Long State: {}\n".format(actuators.longControlState)
-      debug_text += "vEgo: {:.2f}/{:.2f}\n".format(CS.vEgo, CS.vEgo*3.6)
-
-      debug_text += "vPid: {:.2f}/{:.2f}\n".format(loc.v_pid, loc.v_pid*3.6)
-      debug_text += "PID: {:.2f}/{:.2f}/{:.2f}\n".format(loc.pid.p, loc.pid.i, loc.pid.f)
-
-      debug_text += "Actuator Accel: {:.2f}\n".format(actuators.accel)
-      debug_text += "Apply Accel: {:.2f}\n".format(CC.applyAccel)
-      debug_text += "Stock Accel: {:.2f}\n".format(CS.aReqValue)
-      debug_text += "브레이크/가속페달: {}/{}\n".format(CS.brakePressed, CS.gasPressed)
-      long_plan = c.sm["longitudinalPlan"]
-      speeds = long_plan.speeds
-      v_target = 0.0
-      v_target_1sec = 0.0
-      if len(speeds):
-        t_since_plan = (c.sm.frame - c.sm.recv_frame["longitudinalPlan"]) * DT_CTRL
-        v_target = interp(t_since_plan, ModelConstants.T_IDXS[:len(speeds)], speeds)
-        v_target_1sec = interp(t_since_plan + 1.0, ModelConstants.T_IDXS[:len(speeds)], speeds)
-      accelerating = v_target_1sec > v_target
-      starting_condition = (v_target_1sec > c.CP.vEgoStarting and accelerating and not CS.cruiseState.standstill and not CS.brakePressed)
-      debug_text += "목표/1초뒤: {:.2f}/{:.2f}\n".format(v_target, v_target_1sec)
-      debug_text += "가속예측/출발조건: {}/{}\n".format(accelerating, starting_condition)
-
-      lead_radar = c.sm['radarState'].leadOne
-      lead_model = c.sm['modelV2'].leadsV3[0]
-
-      radar_ok = lead_radar.status
-      radar_used = lead_radar.radar if radar_ok else False
-      radar_dist = lead_radar.dRel if radar_ok and radar_used else 0
-      radar_y = lead_radar.yRel if radar_ok and radar_used else 0
-      radar_vrel = lead_radar.vRel if radar_ok and radar_used else 0
-      radar_vlead = lead_radar.vLead if radar_ok and radar_used else 0
-      radar_accel = lead_radar.aLeadK if radar_ok and radar_used else 0
-      radar_id = lead_radar.radarTrackId if radar_ok and radar_used else -1
-
-      vision_ok = lead_model.prob > .5
-      vision_dist = lead_model.x[0] - RADAR_TO_CAMERA if vision_ok else 0
-      vision_y = -lead_model.y[0] if vision_ok else 0
-      vision_vrel = lead_model.v[0] - CS.vEgo if vision_ok else 0
-      vision_prob = lead_model.prob
-
-      debug_text += "앞차거리 레/비/차: {:.1f}/{:.1f}/{:.1f}\n".format(radar_dist, vision_dist, (radar_dist - vision_dist))
-      debug_text += "레이더ID/사용: {}/{}\n".format(radar_id, radar_used)
-      debug_text += "레이더 좌우/상대속도: {:.1f}/{:.1f}\n".format(radar_y, radar_vrel)
-      debug_text += "레이더 앞차속도/가속: {:.1f}/{:.1f}\n".format(radar_vlead, radar_accel)
-      debug_text += "비전 좌우/상대속도: {:.1f}/{:.1f}\n".format(vision_y, vision_vrel)
-      debug_text += "비전확률: {:.2f}\n".format(vision_prob)
-
-      md = c.sm['modelV2']
-      debug_text += "Lane: {:.2f}/{:.2f}, {:.2f}/{:.2f}".format(md.laneLineProbs[1], md.laneLineProbs[2],
-                                                                md.laneLineStds[1], md.laneLineStds[2])
-
+      debug_text  = "상태 정지/롱: {}/{}\n".format(CS.cruiseState.standstill, actuators.longControlState)
+      debug_text += "속도/vPid: {:.2f}/{:.2f}\n".format(CS.vEgo, loc.v_pid)
+      debug_text += "가속 명령/적용/순정: {:.2f}/{:.2f}/{:.2f}\n".format(actuators.accel, CC.applyAccel, CS.aReqValue)
+      debug_text += "입력 브/가스/raw: {}/{}/{:.2f}\n".format(CS.brakePressed, CS.gasPressed, CS.gas)
       CC.debugText = debug_text
 

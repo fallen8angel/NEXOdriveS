@@ -3,7 +3,6 @@ from openpilot.common.numpy_fast import clip, interp
 from openpilot.common.realtime import DT_CTRL
 from openpilot.selfdrive.controls.lib.drive_helpers import CONTROL_N, apply_deadzone
 from openpilot.selfdrive.controls.lib.pid import PIDController
-from openpilot.selfdrive.controls.ntune import ntune_scc_get
 from openpilot.selfdrive.modeld.constants import ModelConstants
 
 LongCtrlState = car.CarControl.Actuators.LongControlState
@@ -81,7 +80,7 @@ class LongControl:
       a_target_upper = 2 * (v_target_upper - v_target_now) / self.CP.longitudinalActuatorDelayUpperBound - a_target_now
 
       v_target = min(v_target_lower, v_target_upper)
-      a_target = min(a_target_lower, a_target_upper) * ntune_scc_get('longLeadSensitivity')
+      a_target = min(a_target_lower, a_target_upper)
 
       v_target_1sec = interp(self.CP.longitudinalActuatorDelayUpperBound + t_since_plan + 1.0, ModelConstants.T_IDXS[:CONTROL_N], speeds)
     else:
@@ -113,15 +112,7 @@ class LongControl:
       self.reset(CS.vEgo)
 
     elif self.long_control_state == LongCtrlState.pid:
-      if v_target_1sec > v_target:
-        long_starting_factor = ntune_scc_get('longStartingFactor')
-        if is_blend:
-          long_starting_factor = (long_starting_factor - 1.) * 0.5 + 1.
-        starting_factor = interp(v_target_now, [1.5, 4.], [long_starting_factor, 1.0])
-        self.v_pid = v_target_now * starting_factor
-        a_target *= starting_factor
-      else:
-        self.v_pid = v_target_now
+      self.v_pid = v_target_now
 
       # Toyota starts braking more when it thinks you want to stop
       # Freeze the integrator so we don't accelerate to compensate, and don't allow positive acceleration
